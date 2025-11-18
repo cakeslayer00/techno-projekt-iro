@@ -19,9 +19,5 @@ services:
       start_period: 30s
 
 volumes:
-  redis_data:
-    driver: local
-  minio_data:
-    driver: local
   postgres_data:
     driver: local
