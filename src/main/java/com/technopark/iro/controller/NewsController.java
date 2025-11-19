@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/news")
 @RequiredArgsConstructor
@@ -74,4 +72,5 @@ public class NewsController {
                 .orElseThrow(() -> new RuntimeException("News not found with id: " + id));
         return ResponseEntity.ok(news);
     }
+
 }
