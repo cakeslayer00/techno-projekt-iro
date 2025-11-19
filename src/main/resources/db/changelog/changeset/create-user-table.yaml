@@ -35,7 +35,7 @@ databaseChangeLog:
       author: vladislav
       changes:
         - createSequence:
-            sequenceName: user_id_seq
+            sequenceName: users_id_seq
             startValue: 1
             incrementBy: 1
             minValue: 1

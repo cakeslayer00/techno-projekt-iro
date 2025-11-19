@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: vladislav
+      changes:
+        - createTable:
+            tableName: news
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: current_timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  defaultValueComputed: current_timestamp
+              - column:
+                  name: image_url
+                  type: varchar(512)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: DRAFT
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 5
+      author: vladislav
+      changes:
+        - createSequence:
+            sequenceName: news_id_seq
+            dataType: bigint
+            incrementBy: 1
+            startValue: 1
+            minValue: 1
