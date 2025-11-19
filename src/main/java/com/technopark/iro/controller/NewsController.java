@@ -1,18 +1,15 @@
 package com.technopark.iro.controller;
 
 import com.technopark.iro.dto.CreateNewsRequest;
+import com.technopark.iro.dto.UpdateNewsRequest;
 import com.technopark.iro.model.entity.News;
 import com.technopark.iro.repository.NewsRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/news")
@@ -36,4 +33,45 @@ public class NewsController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateNews(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateNewsRequest updateNewsRequest) {
+
+        News news = newsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("News not found with id: " + id));
+
+        news.setTitle(updateNewsRequest.title());
+        news.setContent(updateNewsRequest.content());
+        news.setImageUrl(updateNewsRequest.imageUrl());
+
+        if (updateNewsRequest.status() != null) {
+            news.setStatus(updateNewsRequest.status());
+        }
+
+        newsRepository.save(news);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteNews(@PathVariable Long id) {
+        if (!newsRepository.existsById(id)) {
+            throw new RuntimeException("News not found with id: " + id);
+        }
+
+        newsRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<? extends Iterable<News>>     getAllNews() {
+        return ResponseEntity.ok(newsRepository.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<News> getNewsById(@PathVariable Long id) {
+        News news = newsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("News not found with id: " + id));
+        return ResponseEntity.ok(news);
+    }
 }

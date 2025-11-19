@@ -37,7 +37,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/news/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/news/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/news/**").authenticated()
-                        .requestMatchers(HttpMethod.PATCH, "/api/news/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtVerificationFilter, UsernamePasswordAuthenticationFilter.class)
