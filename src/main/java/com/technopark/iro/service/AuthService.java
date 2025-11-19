@@ -1,12 +1,12 @@
 package com.technopark.iro.service;
 
-import com.technopark.iro.dto.AuthRequestDto;
-import com.technopark.iro.dto.AuthResponseDto;
+import com.technopark.iro.dto.AuthRequest;
+import com.technopark.iro.dto.AuthResponse;
 
 public interface AuthService {
 
-    AuthResponseDto authenticate(AuthRequestDto authRequestDto);
+    AuthResponse authenticate(AuthRequest authRequest);
 
-    void register(AuthRequestDto authRequestDto);
+    void register(AuthRequest authRequest);
 
 }

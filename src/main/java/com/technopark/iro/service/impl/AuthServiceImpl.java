@@ -1,8 +1,7 @@
 package com.technopark.iro.service.impl;
 
-import com.technopark.iro.dto.AuthRequestDto;
-import com.technopark.iro.dto.AuthResponseDto;
-import com.technopark.iro.model.Role;
+import com.technopark.iro.dto.AuthRequest;
+import com.technopark.iro.dto.AuthResponse;
 import com.technopark.iro.model.entity.User;
 import com.technopark.iro.repository.UserRepository;
 import com.technopark.iro.service.AuthService;
@@ -26,25 +25,24 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public AuthResponseDto authenticate(AuthRequestDto authRequestDto) {
+    public AuthResponse authenticate(AuthRequest authRequest) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authRequestDto.username(),
-                        authRequestDto.password())
+                        authRequest.username(),
+                        authRequest.password())
         );
 
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         String token = jwtService.generateToken(userDetails);
 
-        return new AuthResponseDto(authRequestDto.username(), token);
+        return new AuthResponse(authRequest.username(), token);
     }
 
     @Override
-    public void register(AuthRequestDto authRequestDto) {
+    public void register(AuthRequest authRequest) {
         User user = new User();
-        user.setUsername(authRequestDto.username());
-        user.setPassword(passwordEncoder.encode(authRequestDto.password()));
-        user.setRole(Role.ADMIN);
+        user.setUsername(authRequest.username());
+        user.setPassword(passwordEncoder.encode(authRequest.password()));
 
         userRepository.save(user);
     }

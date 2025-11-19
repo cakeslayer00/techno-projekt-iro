@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 7
+      author: vladislav
+      changes:
+        - dropColumn:
+            tableName: users
+            columnName: role
