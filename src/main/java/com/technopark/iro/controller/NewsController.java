@@ -62,7 +62,7 @@ public class NewsController {
     }
 
     @GetMapping
-    public ResponseEntity<? extends Iterable<News>>     getAllNews() {
+    public ResponseEntity<? extends Iterable<News>> getAllNews() {
         return ResponseEntity.ok(newsRepository.findAll());
     }
 

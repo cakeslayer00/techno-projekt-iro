@@ -1,7 +1,7 @@
 package com.technopark.iro.repository;
 
 import com.technopark.iro.model.entity.News;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface NewsRepository extends CrudRepository<News, Long> {
+public interface NewsRepository extends JpaRepository<News, Long> {
 }

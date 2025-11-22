@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changeset/add-default-value-for-timestamp-column-user-metadata.yaml
   - include:
       file: db/changelog/changeset/drop-role-column-in-user-table.yaml
+  - include:
+      file: db/changelog/changeset/create-partners-table.yaml

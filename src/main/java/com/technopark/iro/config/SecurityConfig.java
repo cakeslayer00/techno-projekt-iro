@@ -31,12 +31,16 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/news/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/partners/**").permitAll()
 
                         .requestMatchers("/api/auth/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/news/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/news/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/news/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/partners/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/partners/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/partners/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtVerificationFilter, UsernamePasswordAuthenticationFilter.class)

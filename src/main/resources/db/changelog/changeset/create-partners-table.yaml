@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: 8
+      author: vladislav
+      changes:
+        - createSequence:
+            sequenceName: partners_id_seq
+            startValue: 1
+            incrementBy: 1
+            minValue: 1
+
+  - changeSet:
+      id: 9
+      author: vladislav
+      changes:
+        - createTable:
+            tableName: partners
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValueSequenceNext: partners_id_seq
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: country
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: university
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: qs_ranking
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: faculties
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_of_sign
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quota
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: logo
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: datetime
+                  constraints:
+                    nullable: false
