@@ -1,12 +1,12 @@
 package com.technopark.iro.service.impl;
 
 import com.technopark.iro.config.properties.MinioProperties;
-import com.technopark.iro.exception.FileStorageException;
-import com.technopark.iro.exception.InvalidFileException;
+import com.technopark.iro.exception.*;
 import com.technopark.iro.service.StorageService;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
@@ -74,7 +74,10 @@ public class MinioService implements StorageService {
 
             log.info("Successfully retrieved file: {}", filename);
             return new InputStreamResource(stream);
-        } catch (Exception e) {
+        } catch (ErrorResponseException e) {
+            log.error("Failed to find file: {}", filename, e);
+            throw new FileNotFoundException("File not found");
+        }  catch (Exception e) {
             log.error("Failed to download file: {}", filename, e);
             throw new FileStorageException(String.format(ERR_DOWNLOAD_FAILED, filename), e);
         }
@@ -82,16 +85,16 @@ public class MinioService implements StorageService {
 
     private void validateFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new InvalidFileException(ERR_FILE_EMPTY);
+            throw new EmptyFileException(ERR_FILE_EMPTY);
         }
 
         if (file.getSize() > MAX_FILE_SIZE) {
-            throw new InvalidFileException(ERR_FILE_SIZE_EXCEEDED.formatted(MAX_FILE_SIZE / (1024 * 1024)));
+            throw new MaxUploadSizeExceededException(ERR_FILE_SIZE_EXCEEDED.formatted(MAX_FILE_SIZE / (1024 * 1024)));
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {
-            throw new InvalidFileException(ERR_INVALID_FILE_TYPE.formatted(String.join(", ", ALLOWED_CONTENT_TYPES)));
+            throw new InvalidContentTypeException(ERR_INVALID_FILE_TYPE.formatted(String.join(", ", ALLOWED_CONTENT_TYPES)));
         }
     }
 
@@ -127,4 +130,5 @@ public class MinioService implements StorageService {
             throw new FileStorageException(ERR_MINIO_UPLOAD, e);
         }
     }
+
 }
