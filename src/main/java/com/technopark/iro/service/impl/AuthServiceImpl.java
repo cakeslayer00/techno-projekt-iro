@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         String token = jwtService.generateToken(userDetails);
 
-        log.info("User {} is authenticated: {}", token);
+        log.info("User {} is authenticated", userDetails.getUsername());
         return new AuthResponse(authRequest.username(), token);
     }
 
@@ -47,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
         user.setUsername(authRequest.username());
         user.setPassword(passwordEncoder.encode(authRequest.password()));
 
+        log.info("New user '{}' is created", user.getUsername());
         userRepository.save(user);
     }
 
