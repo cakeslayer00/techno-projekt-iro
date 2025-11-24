@@ -1,7 +1,9 @@
 package com.technopark.iro.config;
 
+import com.technopark.iro.config.properties.JwtProperties;
 import com.technopark.iro.filter.JwtVerificationFilter;
 import com.technopark.iro.repository.UserRepository;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,6 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
 
     @Bean
@@ -32,9 +35,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/news/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/partners/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/media/**").permitAll()
 
                         .requestMatchers("/api/auth/**").permitAll()
 
+                        .requestMatchers(HttpMethod.POST, "/api/media/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/media/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/media/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/news/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/news/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/news/**").authenticated()

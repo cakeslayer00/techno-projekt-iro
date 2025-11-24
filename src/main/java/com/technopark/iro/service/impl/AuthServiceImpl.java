@@ -7,6 +7,7 @@ import com.technopark.iro.repository.UserRepository;
 import com.technopark.iro.service.AuthService;
 import com.technopark.iro.service.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -35,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         String token = jwtService.generateToken(userDetails);
 
+        log.info("User {} is authenticated: {}", token);
         return new AuthResponse(authRequest.username(), token);
     }
 
