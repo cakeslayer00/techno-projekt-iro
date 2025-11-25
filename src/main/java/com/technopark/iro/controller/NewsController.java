@@ -1,13 +1,20 @@
 package com.technopark.iro.controller;
 
 import com.technopark.iro.dto.CreateNewsRequest;
+import com.technopark.iro.dto.NewsResponse;
 import com.technopark.iro.dto.UpdateNewsRequest;
+import com.technopark.iro.mapper.NewsMapper;
 import com.technopark.iro.model.entity.News;
 import com.technopark.iro.repository.NewsRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/news")
@@ -15,6 +22,27 @@ import org.springframework.web.bind.annotation.*;
 public class NewsController {
 
     private final NewsRepository newsRepository;
+
+    @GetMapping
+    public ResponseEntity<List<NewsResponse>> getAllNews() {
+        return ResponseEntity.ok(newsRepository.findAll()
+                .stream()
+                .map(NewsMapper.INSTANCE::toResponse)
+                .toList());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<NewsResponse> getNewsById(@PathVariable Long id) {
+        News news = newsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("News not found with id: " + id));
+
+        return ResponseEntity.ok(NewsMapper.INSTANCE.toResponse(news));
+    }
+
+    @GetMapping("/pages")
+    public ResponseEntity<Page<NewsResponse>> getAllNewsByPage(@PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(newsRepository.findAll(pageable).map(NewsMapper.INSTANCE::toResponse));
+    }
 
     @PostMapping
     public ResponseEntity<Void> createNews(@Valid @RequestBody CreateNewsRequest createNewsRequest) {
@@ -59,18 +87,6 @@ public class NewsController {
 
         newsRepository.deleteById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping
-    public ResponseEntity<? extends Iterable<News>> getAllNews() {
-        return ResponseEntity.ok(newsRepository.findAll());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<News> getNewsById(@PathVariable Long id) {
-        News news = newsRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("News not found with id: " + id));
-        return ResponseEntity.ok(news);
     }
 
 }
