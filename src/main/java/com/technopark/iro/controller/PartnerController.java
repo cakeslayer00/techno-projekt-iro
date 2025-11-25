@@ -6,10 +6,13 @@ import com.technopark.iro.dto.UpdatePartnerRequest;
 import com.technopark.iro.mapper.PartnerMapper;
 import com.technopark.iro.model.entity.Partner;
 import com.technopark.iro.repository.PartnerRepository;
+import com.technopark.iro.repository.filter.PartnerFilter;
+import com.technopark.iro.repository.specification.PartnerSpecs;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +43,13 @@ public class PartnerController {
     @GetMapping("/pages")
     public ResponseEntity<Page<PartnerResponse>> getAllNewsByPage(@PageableDefault Pageable pageable) {
         return ResponseEntity.ok(partnerRepository.findAll(pageable).map(PartnerMapper.INSTANCE::toResponse));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Page<PartnerResponse>> getAllFilteredByPage(@ModelAttribute PartnerFilter partnerFilter,
+                                                                      @PageableDefault Pageable pageable) {
+        Specification<Partner> spec = PartnerSpecs.filterBy(partnerFilter);
+        return ResponseEntity.ok(partnerRepository.findAll(spec, pageable).map(PartnerMapper.INSTANCE::toResponse));
     }
 
     @PostMapping

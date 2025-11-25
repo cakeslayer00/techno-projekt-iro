@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: 10
+      author: vladislav
+      comment: Add indexes on frequently queried columns for performance optimization
+      changes:
+        - createIndex:
+            indexName: idx_partner_country
+            tableName: partners
+            columns:
+              - column:
+                  name: country
+
+        - createIndex:
+            indexName: idx_partner_university
+            tableName: partners
+            columns:
+              - column:
+                  name: university
+
+        - createIndex:
+            indexName: idx_partner_status
+            tableName: partners
+            columns:
+              - column:
+                  name: status
+
+      rollback:
+        - dropIndex:
+            indexName: idx_partner_country
+            tableName: partners
+        - dropIndex:
+            indexName: idx_partner_university
+            tableName: partners
+        - dropIndex:
+            indexName: idx_partner_status
+            tableName: partners
+
+  - changeSet:
+      id: 11
+      author: vladislav
+      comment: Add composite index for country and status combination
+      changes:
+        - createIndex:
+            indexName: idx_partner_country_status
+            tableName: partners
+            columns:
+              - column:
+                  name: country
+              - column:
+                  name: status
+
+      rollback:
+        - dropIndex:
+            indexName: idx_partner_country_status
+            tableName: partners
