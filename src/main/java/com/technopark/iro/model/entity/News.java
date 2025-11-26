@@ -2,26 +2,26 @@ package com.technopark.iro.model.entity;
 
 import com.technopark.iro.model.NewsStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "news")
 @Getter
 @Setter
+@Builder
+@Table(name = "news")
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class News {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "news_seq_gen")
     @SequenceGenerator(name = "news_seq_gen", sequenceName = "news_id_seq", allocationSize = 1)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "title")

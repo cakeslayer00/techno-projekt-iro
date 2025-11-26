@@ -24,4 +24,5 @@ public interface PartnerMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(UpdatePartnerRequest request, @MappingTarget Partner partner);
+
 }

@@ -1,20 +1,17 @@
 package com.technopark.iro.advice;
 
 import com.technopark.iro.exception.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -22,7 +19,6 @@ public class GlobalExceptionHandler {
     private static final String ERR_VALIDATION_FAILED = "Validation failed for one or more fields";
 
     @ExceptionHandler(BadCredentialsException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ProblemDetail handleBadCredentials(BadCredentialsException e) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.UNAUTHORIZED,
@@ -32,10 +28,19 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+    @ExceptionHandler(NewsNotFoundException.class)
+    public ProblemDetail handleNewsNotFoundException(NewsNotFoundException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("News Not Found");
+
+        return problemDetail;
+    }
+
     @ExceptionHandler(PartnerNotFoundException.class)
     public ProblemDetail handlePartnerNotFoundException(PartnerNotFoundException ex) {
-        log.error("Partner not found: {}", ex.getMessage());
-
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
@@ -47,8 +52,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidationException(MethodArgumentNotValidException ex) {
-        log.error("Validation error: {}", ex.getMessage());
-
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();

@@ -3,7 +3,6 @@ package com.technopark.iro.service;
 import com.technopark.iro.dto.CreatePartnerRequest;
 import com.technopark.iro.dto.PartnerResponse;
 import com.technopark.iro.dto.UpdatePartnerRequest;
-import com.technopark.iro.repository.PartnerRepository;
 import com.technopark.iro.repository.filter.PartnerFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,4 +24,5 @@ public interface PartnerService {
     PartnerResponse updatePartner(Long id, UpdatePartnerRequest request);
 
     void deletePartner(Long id);
+
 }

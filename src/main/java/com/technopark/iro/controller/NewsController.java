@@ -3,89 +3,193 @@ package com.technopark.iro.controller;
 import com.technopark.iro.dto.CreateNewsRequest;
 import com.technopark.iro.dto.NewsResponse;
 import com.technopark.iro.dto.UpdateNewsRequest;
-import com.technopark.iro.mapper.NewsMapper;
-import com.technopark.iro.model.entity.News;
-import com.technopark.iro.repository.NewsRepository;
+import com.technopark.iro.repository.filter.NewsFilter;
+import com.technopark.iro.service.NewsService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/news")
 @RequiredArgsConstructor
+@Tag(name = "News", description = "API for managing news articles")
 public class NewsController {
 
-    private final NewsRepository newsRepository;
+    private final NewsService newsService;
 
     @GetMapping
+    @Operation(
+            summary = "Get all news",
+            description = "Retrieves a list of all news articles without pagination"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved list",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = NewsResponse.class)))
+    )
     public ResponseEntity<List<NewsResponse>> getAllNews() {
-        return ResponseEntity.ok(newsRepository.findAll()
-                .stream()
-                .map(NewsMapper.INSTANCE::toResponse)
-                .toList());
+        return ResponseEntity.ok(newsService.getAllNews());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NewsResponse> getNewsById(@PathVariable Long id) {
-        News news = newsRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("News not found with id: " + id));
-
-        return ResponseEntity.ok(NewsMapper.INSTANCE.toResponse(news));
+    @Operation(
+            summary = "Get news by ID",
+            description = "Retrieves a specific news article by its unique identifier"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "News found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = NewsResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "News not found",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<NewsResponse> getNewsById(
+            @Parameter(description = "ID of the news article to be retrieved")
+            @PathVariable Long id) {
+        return ResponseEntity.ok(newsService.getNewsById(id));
     }
 
     @GetMapping("/pages")
-    public ResponseEntity<Page<NewsResponse>> getAllNewsByPage(@PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(newsRepository.findAll(pageable).map(NewsMapper.INSTANCE::toResponse));
+    @Operation(
+            summary = "Get news (Paginated)",
+            description = "Retrieves a paginated list of news articles"
+    )
+    public ResponseEntity<Page<NewsResponse>> getAllNewsByPage(
+            @ParameterObject @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(newsService.getAllNewsByPage(pageable));
+    }
+
+    @GetMapping("/filter")
+    @Operation(
+            summary = "Filter news",
+            description = "Retrieves a paginated list of news articles based on filter criteria"
+    )
+    public ResponseEntity<Page<NewsResponse>> getAllFilteredByPage(
+            @ParameterObject @ModelAttribute NewsFilter newsFilter,
+            @ParameterObject @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(newsService.getFilteredNews(newsFilter, pageable));
     }
 
     @PostMapping
-    public ResponseEntity<Void> createNews(@Valid @RequestBody CreateNewsRequest createNewsRequest) {
-        News news = new News();
-        news.setTitle(createNewsRequest.title());
-        news.setContent(createNewsRequest.content());
-        news.setImageUrl(createNewsRequest.imageUrl());
-
-        if (createNewsRequest.status() != null) {
-            news.setStatus(createNewsRequest.status());
-        }
-
-        newsRepository.save(news);
-        return ResponseEntity.ok().build();
+    @Operation(
+            summary = "Create a news article",
+            description = "Creates a new news article resource"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "News created successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = NewsResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<NewsResponse> createNews(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Payload with news article data",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = CreateNewsRequest.class)
+                    )
+            )
+            @Valid @RequestBody CreateNewsRequest createNewsRequest) {
+        NewsResponse news = newsService.createNews(createNewsRequest);
+        return ResponseEntity
+                .created(URI.create("/api/news/" + news.id()))
+                .body(news);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateNews(
+    @Operation(
+            summary = "Update a news article",
+            description = "Updates an existing news article's details"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "News updated successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = NewsResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "News not found",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<NewsResponse> updateNews(
+            @Parameter(description = "ID of the news article to update")
             @PathVariable Long id,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Payload with updated news article data",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UpdateNewsRequest.class)
+                    )
+            )
             @Valid @RequestBody UpdateNewsRequest updateNewsRequest) {
-
-        News news = newsRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("News not found with id: " + id));
-
-        news.setTitle(updateNewsRequest.title());
-        news.setContent(updateNewsRequest.content());
-        news.setImageUrl(updateNewsRequest.imageUrl());
-
-        if (updateNewsRequest.status() != null) {
-            news.setStatus(updateNewsRequest.status());
-        }
-
-        newsRepository.save(news);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(newsService.updateNews(id, updateNewsRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNews(@PathVariable Long id) {
-        if (!newsRepository.existsById(id)) {
-            throw new RuntimeException("News not found with id: " + id);
-        }
-
-        newsRepository.deleteById(id);
+    @Operation(
+            summary = "Delete a news article",
+            description = "Permanently removes a news article from the system"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "News deleted successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "News not found",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<Void> deleteNews(
+            @Parameter(description = "ID of the news article to delete")
+            @PathVariable Long id) {
+        newsService.deleteNews(id);
         return ResponseEntity.noContent().build();
     }
 

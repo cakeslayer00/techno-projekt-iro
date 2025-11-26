@@ -33,6 +33,8 @@ public class SecurityConfig {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/open-api/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll() //TODO: Make authenticated
+
                         .requestMatchers(HttpMethod.GET, "/api/news/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/partners/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/media/**").permitAll()

@@ -102,4 +102,5 @@ public class PartnerServiceImpl implements PartnerService {
         partnerRepository.deleteById(id);
         log.info("Partner deleted with id: {}", id);
     }
+
 }
