@@ -18,13 +18,23 @@ public class GlobalExceptionHandler {
     private static final String ERR_GENERIC_INTERNAL_MESSAGE = "An unexpected error occurred. Trace: %s";
     private static final String ERR_VALIDATION_FAILED = "Validation failed for one or more fields";
 
-    @ExceptionHandler(BadCredentialsException.class)
-    public ProblemDetail handleBadCredentials(BadCredentialsException e) {
+    @ExceptionHandler(InvalidUserCredentialsException.class)
+    public ProblemDetail handleInvalidUserCredentials(InvalidUserCredentialsException e) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.UNAUTHORIZED,
                 e.getMessage()
         );
         problem.setTitle("Invalid credentials");
+        return problem;
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ProblemDetail handleUserAlreadyExists(UserAlreadyExistsException e) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+        problem.setTitle("User Already Exists");
         return problem;
     }
 

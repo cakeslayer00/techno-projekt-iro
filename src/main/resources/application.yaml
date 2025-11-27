@@ -22,4 +22,4 @@ spring:
     endpoint: http://localhost:9000
     username: ${MINIO_USER}
     password: ${MINIO_PASSWORD}
-    bucket-name: user-files
+    bucket-name: files

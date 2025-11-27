@@ -8,7 +8,6 @@ import org.mapstruct.*;
 import org.springframework.stereotype.Component;
 
 @Mapper(componentModel = "spring")
-@Component
 public interface PartnerMapper {
 
     @Mapping(target = "dateOfSign", source = "dateOfSign", dateFormat = "yyyy-MM-dd")

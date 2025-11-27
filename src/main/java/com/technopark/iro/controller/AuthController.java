@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,27 +33,23 @@ public class AuthController {
     )
     @ApiResponses({
             @ApiResponse(
-                    responseCode = "200",
-                    description = "User registered successfully"
+                    responseCode = "201",
+                    description = "User registered successfully",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid input data or user already exists",
+                    description = "Invalid input data",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "User already exists",
                     content = @Content
             )
     })
-    public ResponseEntity<Void> register(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "User registration credentials",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = AuthRequest.class)
-                    )
-            )
-            @Valid @RequestBody AuthRequest authRequest) {
-        authService.register(authRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody AuthRequest authRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(authRequest));
     }
 
     @PostMapping("/sign-in")
@@ -80,16 +77,7 @@ public class AuthController {
                     content = @Content
             )
     })
-    public ResponseEntity<AuthResponse> authenticate(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "User authentication credentials",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = AuthRequest.class)
-                    )
-            )
-            @Valid @RequestBody AuthRequest authRequest) {
+    public ResponseEntity<AuthResponse> authenticate(@Valid @RequestBody AuthRequest authRequest) {
         return ResponseEntity.ok(authService.authenticate(authRequest));
     }
 
