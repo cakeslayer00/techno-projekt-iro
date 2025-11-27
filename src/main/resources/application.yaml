@@ -2,7 +2,14 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: 86400000
 
+
 spring:
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
   application:
     name: iro
 

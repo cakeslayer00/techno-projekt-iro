@@ -1,11 +1,10 @@
 package com.technopark.iro.service.impl;
 
 import com.technopark.iro.config.properties.MinioProperties;
+import com.technopark.iro.dto.FileDownloadResponse;
 import com.technopark.iro.exception.*;
 import com.technopark.iro.service.StorageService;
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,10 +61,16 @@ public class MinioStorageService implements StorageService {
     }
 
     @Override
-    public Resource download(String filename) {
+    public FileDownloadResponse download(String filename) {
         validateFilename(filename);
 
         try {
+            StatObjectResponse sor = minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(minioProperties.bucketName())
+                            .object(filename)
+                            .build());
+
             InputStream stream = minioClient.getObject(
                     GetObjectArgs.builder()
                             .bucket(minioProperties.bucketName())
@@ -73,7 +78,7 @@ public class MinioStorageService implements StorageService {
                             .build());
 
             log.info("Successfully retrieved file: {}", filename);
-            return new InputStreamResource(stream);
+            return new FileDownloadResponse(new InputStreamResource(stream), sor.contentType(), sor.size());
         } catch (ErrorResponseException e) {
             log.error("Failed to find file: {}", filename, e);
             throw new FileNotFoundException("File not found");

@@ -1,5 +1,6 @@
 package com.technopark.iro.controller;
 
+import com.technopark.iro.dto.FileDownloadResponse;
 import com.technopark.iro.dto.FileUploadResponse;
 import com.technopark.iro.service.StorageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,9 +10,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +26,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequiredArgsConstructor
 @Tag(name = "Media", description = "API for file upload and download operations")
 public class MediaController {
-
-    private static final String DOWNLOAD_CONTENT_TYPE = "application/octet-stream";
 
     private final StorageService storageService;
 
@@ -42,16 +43,8 @@ public class MediaController {
                             schema = @Schema(implementation = FileUploadResponse.class)
                     )
             ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid file or file upload failed",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "413",
-                    description = "File size exceeds maximum limit",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "400", description = "Invalid file or file upload failed"),
+            @ApiResponse(responseCode = "413", description = "File size exceeds maximum limit")
     })
     public ResponseEntity<FileUploadResponse> uploadFile(
             @Parameter(
@@ -75,7 +68,7 @@ public class MediaController {
                 file.getSize()
         );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/download/{filename:.+}")
@@ -86,15 +79,11 @@ public class MediaController {
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
-                    description = "File downloaded successfully",
-                    content = @Content(
-                            mediaType = "application/octet-stream"
-                    )
+                    description = "File downloaded successfully"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "File not found",
-                    content = @Content
+                    description = "File not found"
             )
     })
     public ResponseEntity<Resource> downloadFile(
@@ -104,12 +93,13 @@ public class MediaController {
                     example = "image.jpg"
             )
             @PathVariable String filename) {
-        Resource resource = storageService.download(filename);
+        FileDownloadResponse download = storageService.download(filename);
 
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(DOWNLOAD_CONTENT_TYPE))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
-                .body(resource);
+                .contentType(MediaType.parseMediaType(download.contentType()))
+                .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(download.size()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .body(download.resource());
     }
 
 }
