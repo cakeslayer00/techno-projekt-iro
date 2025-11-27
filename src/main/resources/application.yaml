@@ -2,7 +2,6 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: 86400000
 
-
 spring:
 
   servlet:
@@ -14,7 +13,7 @@ spring:
     name: iro
 
   config:
-    import: file:.env[.properties]
+    import: optional:file:.env[.properties]
 
   datasource:
     username: ${POSTGRES_USER}
