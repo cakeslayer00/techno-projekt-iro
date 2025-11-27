@@ -13,5 +13,3 @@ databaseChangeLog:
       file: db/changelog/changeset/create-partners-table.yaml
   - include:
       file: db/changelog/changeset/add-indexes-partner-table.yaml
-  - include:
-      file: db/changelog/changeset/add-indexes-news-table.yaml

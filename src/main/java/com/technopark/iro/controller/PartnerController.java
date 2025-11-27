@@ -33,81 +33,50 @@ public class PartnerController {
     private final PartnerService partnerService;
 
     @GetMapping
-    @Operation(
-            summary = "Get all partners",
-            description = "Retrieves a list of all partners without pagination"
-    )
+    @Operation(summary = "Get all partners", description = "Retrieves a list of all partners without pagination")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     public ResponseEntity<List<PartnerResponse>> getAllPartners() {
         return ResponseEntity.ok(partnerService.getAllPartners());
     }
 
     @GetMapping("/{partnerId}")
-    @Operation(
-            summary = "Get partner by ID",
-            description = "Retrieves a specific partner by their unique identifier"
-    )
+    @Operation(summary = "Get partner by ID", description = "Retrieves a specific partner by their unique identifier")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
                     description = "Partner found",
                     content = @Content(schema = @Schema(implementation = PartnerResponse.class))
             ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Partner not found",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "404", description = "Partner not found")
     })
-    public ResponseEntity<PartnerResponse> getPartnerById(
-            @Parameter(description = "ID of the partner to be retrieved")
-            @PathVariable Long partnerId) {
+    public ResponseEntity<PartnerResponse> getPartnerById(@Parameter(description = "ID of the partner to be retrieved")
+                                                          @PathVariable Long partnerId) {
         return ResponseEntity.ok(partnerService.getPartnerById(partnerId));
     }
 
     @GetMapping("/pages")
-    @Operation(
-            summary = "Get partners (Paginated)",
-            description = "Retrieves a paginated list of partners"
-    )
-    public ResponseEntity<Page<PartnerResponse>> getAllPartnersByPage(
-            @ParameterObject @PageableDefault Pageable pageable) {
+    @Operation(summary = "Get partners (Paginated)", description = "Retrieves a paginated list of partners")
+    public ResponseEntity<Page<PartnerResponse>> getAllPartnersByPage(@ParameterObject @PageableDefault Pageable pageable) {
         return ResponseEntity.ok(partnerService.getAllPartnersByPage(pageable));
     }
 
     @GetMapping("/filter")
-    @Operation(
-            summary = "Filter partners",
-            description = "Retrieves a paginated list of partners based on filter criteria"
-    )
-    public ResponseEntity<Page<PartnerResponse>> getAllFilteredByPage(
-            @ParameterObject @ModelAttribute PartnerFilter partnerFilter,
-            @ParameterObject @PageableDefault Pageable pageable) {
+    @Operation(summary = "Filter partners", description = "Retrieves a paginated list of partners based on filter criteria")
+    public ResponseEntity<Page<PartnerResponse>> getAllFilteredByPage(@ParameterObject @ModelAttribute PartnerFilter partnerFilter,
+                                                                      @ParameterObject @PageableDefault Pageable pageable) {
         return ResponseEntity.ok(partnerService.getFilteredPartners(partnerFilter, pageable));
     }
 
     @PostMapping
-    @Operation(
-            summary = "Create a new partner",
-            description = "Creates a new partner resource"
-    )
+    @Operation(summary = "Create a new partner", description = "Creates a new partner resource")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "201",
                     description = "Partner created successfully",
                     content = @Content(schema = @Schema(implementation = PartnerResponse.class))),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid input data",
-                    content = @Content)
+            @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
-    public ResponseEntity<PartnerResponse> createPartner(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Payload with partner upload data",
-                    required = true,
-                    content = @Content(mediaType = "application/json")
-            )
-            @Valid @RequestBody CreatePartnerRequest request) {
+    public ResponseEntity<PartnerResponse> createPartner(@Valid @RequestBody CreatePartnerRequest request) {
         PartnerResponse created = partnerService.createPartner(request);
         return ResponseEntity
                 .created(URI.create("/api/partners/" + created.id()))
@@ -115,42 +84,29 @@ public class PartnerController {
     }
 
     @PutMapping("/{id}")
-    @Operation(
-            summary = "Update a partner",
-            description = "Updates an existing partner's details"
-    )
+    @Operation(summary = "Update a partner", description = "Updates an existing partner's details")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
                     description = "Partner updated successfully",
                     content = @Content(schema = @Schema(implementation = PartnerResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Partner not found", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content)
+            @ApiResponse(responseCode = "404", description = "Partner not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
-    public ResponseEntity<PartnerResponse> updatePartner(
-            @Parameter(description = "ID of the partner to update")
-            @PathVariable Long id,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Payload with partner upload data",
-                    required = true,
-                    content = @Content(mediaType = "application/json")
-            )
-            @Valid @RequestBody UpdatePartnerRequest request) {
+    public ResponseEntity<PartnerResponse> updatePartner(@Parameter(description = "ID of the partner to update")
+                                                         @PathVariable Long id,
+                                                         @Valid @RequestBody UpdatePartnerRequest request) {
         return ResponseEntity.ok(partnerService.updatePartner(id, request));
     }
 
     @DeleteMapping("/{id}")
-    @Operation(
-            summary = "Delete a partner",
-            description = "Permanently removes a partner from the system"
-    )
+    @Operation(summary = "Delete a partner", description = "Permanently removes a partner from the system")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Partner deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Partner not found", content = @Content)
     })
-    public ResponseEntity<Void> deletePartner(
-            @Parameter(description = "ID of the partner to delete")
-            @PathVariable Long id) {
+    public ResponseEntity<Void> deletePartner(@Parameter(description = "ID of the partner to delete")
+                                              @PathVariable Long id) {
         partnerService.deletePartner(id);
         return ResponseEntity.noContent().build();
     }

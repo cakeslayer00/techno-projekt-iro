@@ -70,7 +70,7 @@ public class NewsServiceImpl implements NewsService {
         log.info("Creating new news with title: {}", request.title());
 
         News news = newsMapper.toEntity(request);
-        News saved = newsRepository.save(news);
+        News saved = newsRepository.saveAndFlush(news);
 
         log.info("News created with id: {}", saved.getId());
         return newsMapper.toResponse(saved);

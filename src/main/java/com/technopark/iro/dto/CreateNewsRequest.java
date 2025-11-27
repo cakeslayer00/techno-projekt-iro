@@ -15,11 +15,11 @@ public record CreateNewsRequest(@NotBlank(message = "Title is required")
                                 @Schema(description = "News content", example = "We are pleased to announce...", requiredMode = Schema.RequiredMode.REQUIRED)
                                 String content,
 
+                                @NotBlank(message = "Image URL is required")
                                 @Size(max = 512, message = "Image URL must not exceed 512 characters")
                                 @Schema(description = "Image URL", example = "https://storage.com/image.jpg", requiredMode = Schema.RequiredMode.REQUIRED)
                                 String imageUrl,
 
-                                @NotBlank(message = "Status is required")
                                 @Schema(description = "News status", example = "DRAFT", requiredMode = Schema.RequiredMode.REQUIRED)
                                 NewsStatus status) {
 }

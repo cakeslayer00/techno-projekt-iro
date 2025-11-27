@@ -34,10 +34,7 @@ public class NewsController {
     private final NewsService newsService;
 
     @GetMapping
-    @Operation(
-            summary = "Get all news",
-            description = "Retrieves a list of all news articles without pagination"
-    )
+    @Operation(summary = "Get all news", description = "Retrieves a list of all news articles without pagination")
     @ApiResponse(
             responseCode = "200",
             description = "Successfully retrieved list",
@@ -48,10 +45,7 @@ public class NewsController {
     }
 
     @GetMapping("/{id}")
-    @Operation(
-            summary = "Get news by ID",
-            description = "Retrieves a specific news article by its unique identifier"
-    )
+    @Operation(summary = "Get news by ID", description = "Retrieves a specific news article by its unique identifier")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
@@ -61,11 +55,7 @@ public class NewsController {
                             schema = @Schema(implementation = NewsResponse.class)
                     )
             ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "News not found",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "404", description = "News not found")
     })
     public ResponseEntity<NewsResponse> getNewsById(
             @Parameter(description = "ID of the news article to be retrieved")
@@ -74,31 +64,20 @@ public class NewsController {
     }
 
     @GetMapping("/pages")
-    @Operation(
-            summary = "Get news (Paginated)",
-            description = "Retrieves a paginated list of news articles"
-    )
-    public ResponseEntity<Page<NewsResponse>> getAllNewsByPage(
-            @ParameterObject @PageableDefault Pageable pageable) {
+    @Operation(summary = "Get news (Paginated)", description = "Retrieves a paginated list of news articles")
+    public ResponseEntity<Page<NewsResponse>> getAllNewsByPage(@ParameterObject @PageableDefault Pageable pageable) {
         return ResponseEntity.ok(newsService.getAllNewsByPage(pageable));
     }
 
     @GetMapping("/filter")
-    @Operation(
-            summary = "Filter news",
-            description = "Retrieves a paginated list of news articles based on filter criteria"
-    )
-    public ResponseEntity<Page<NewsResponse>> getAllFilteredByPage(
-            @ParameterObject @ModelAttribute NewsFilter newsFilter,
-            @ParameterObject @PageableDefault Pageable pageable) {
+    @Operation(summary = "Filter news", description = "Retrieves a paginated list of news articles based on filter criteria")
+    public ResponseEntity<Page<NewsResponse>> getAllFilteredByPage(@ParameterObject @ModelAttribute NewsFilter newsFilter,
+                                                                   @ParameterObject @PageableDefault Pageable pageable) {
         return ResponseEntity.ok(newsService.getFilteredNews(newsFilter, pageable));
     }
 
     @PostMapping
-    @Operation(
-            summary = "Create a news article",
-            description = "Creates a new news article resource"
-    )
+    @Operation(summary = "Create a news article", description = "Creates a new news article resource")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "201",
@@ -108,22 +87,9 @@ public class NewsController {
                             schema = @Schema(implementation = NewsResponse.class)
                     )
             ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid input data",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
-    public ResponseEntity<NewsResponse> createNews(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Payload with news article data",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = CreateNewsRequest.class)
-                    )
-            )
-            @Valid @RequestBody CreateNewsRequest createNewsRequest) {
+    public ResponseEntity<NewsResponse> createNews(@Valid @RequestBody CreateNewsRequest createNewsRequest) {
         NewsResponse news = newsService.createNews(createNewsRequest);
         return ResponseEntity
                 .created(URI.create("/api/news/" + news.id()))
@@ -131,10 +97,7 @@ public class NewsController {
     }
 
     @PutMapping("/{id}")
-    @Operation(
-            summary = "Update a news article",
-            description = "Updates an existing news article's details"
-    )
+    @Operation(summary = "Update a news article", description = "Updates an existing news article's details")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
@@ -144,47 +107,20 @@ public class NewsController {
                             schema = @Schema(implementation = NewsResponse.class)
                     )
             ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "News not found",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid input data",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "404", description = "News not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
-    public ResponseEntity<NewsResponse> updateNews(
-            @Parameter(description = "ID of the news article to update")
-            @PathVariable Long id,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Payload with updated news article data",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = UpdateNewsRequest.class)
-                    )
-            )
-            @Valid @RequestBody UpdateNewsRequest updateNewsRequest) {
+    public ResponseEntity<NewsResponse> updateNews(@Parameter(description = "ID of the news article to update")
+                                                   @PathVariable Long id,
+                                                   @Valid @RequestBody UpdateNewsRequest updateNewsRequest) {
         return ResponseEntity.ok(newsService.updateNews(id, updateNewsRequest));
     }
 
     @DeleteMapping("/{id}")
-    @Operation(
-            summary = "Delete a news article",
-            description = "Permanently removes a news article from the system"
-    )
+    @Operation(summary = "Delete a news article", description = "Permanently removes a news article from the system")
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "News deleted successfully"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "News not found",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "204", description = "News deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "News not found")
     })
     public ResponseEntity<Void> deleteNews(
             @Parameter(description = "ID of the news article to delete")
