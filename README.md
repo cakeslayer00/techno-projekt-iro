@@ -15,7 +15,7 @@
 
 ## How to Install and Run
 1. Clone the repository using any method convenient for you
-2. Enter the directory: `cd iro`
+2. Enter the directory: `cd techno-projekt-iro`
 3. Create a `.env` file:
    - You can create one by using .env.example as guide
 4. Start the application: `docker compose up --build`
